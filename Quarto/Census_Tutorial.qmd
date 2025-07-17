@@ -6,11 +6,52 @@ format:
     toc: true
     toc-depth: 3
     toc-location: right
-    code-fold: true
+    code-fold: show
     code-overflow: wrap
     code-tools: true
     theme: cosmo
     fig-format: svg
 ---
 
-## 
+```{r loading libraries}
+# install.packages("pacman") optional but nice way to load multiple packages
+pacman::p_load(tidyverse, tidycensus)
+
+```
+
+## The Census API
+
+Obtain Census API key <https://api.census.gov/data/key_signup.html>
+
+Once obtained and activated from your email install the API on your computer. Setting install = true will add the API key to a .Renviron file typically located in `C:/Users/yourname/Documents/.Renviron`
+
+This only needs to be done one time
+
+```{r Install API Key}
+# install.packages("tidycensus") if not installed
+# census_api_key("YOUR KEY GOES HERE", install = TRUE)
+```
+
+## Getting Census Data
+
+Using function [`get_decennial()`](https://walker-data.com/tidycensus/reference/get_decennial.html) users can retrieve data from the 2000, 2010 or 2020 US Censuses.
+
+Lets get the 2010 population estimates for each County in WA.
+
+```{r Get 2010 WA Population}
+#| message: false
+population_WA_Counties_2010 <- get_decennial(
+  geography = "county",
+  year = 2010,
+  state = "WA",
+  variable = "P001001"
+)
+
+```
+
+```{r}
+#| echo: FALSE
+head(population_WA_Counties_2010, n = 5)
+ population_WA_Counties_2010 %>% summarise(mean_population = mean(value))
+
+```
