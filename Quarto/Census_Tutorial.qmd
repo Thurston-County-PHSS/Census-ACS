@@ -1,0 +1,16 @@
+---
+title: "Census ACS Tutorial"
+author: "Jacob Armitage"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    toc-location: right
+    code-fold: true
+    code-overflow: wrap
+    code-tools: true
+    theme: cosmo
+    fig-format: svg
+---
+
+## 
