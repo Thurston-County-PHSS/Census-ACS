@@ -1,5 +1,5 @@
 ---
-title: "Census ACS Tutorial"
+title: "Census & ACS Data Tutorial"
 author: "Jacob Armitage"
 format:
   html:
@@ -8,15 +8,20 @@ format:
     toc-location: right
     code-fold: show
     code-overflow: wrap
-    code-tools: true
+    code-tools: false
     theme: cosmo
     fig-format: svg
 ---
 
-```{r loading libraries}
-# install.packages("pacman") optional but nice way to load multiple packages
+```{r required packages}
+# install.packages("pacman") optional but nice way to install and load multiple packages at once, can also use install.packages and library separately 
 pacman::p_load(tidyverse, tidycensus)
 
+```
+
+```{r packages for making document only}
+#| echo: false
+pacman::p_load(gt)
 ```
 
 ## The Census API
@@ -51,7 +56,10 @@ population_WA_Counties_2010 <- get_decennial(
 
 ```{r}
 #| echo: FALSE
-head(population_WA_Counties_2010, n = 5)
- population_WA_Counties_2010 %>% summarise(mean_population = mean(value))
+head(population_WA_Counties_2010, n = 5) %>% 
+  gt() %>% 
+  tab_options(
+    table.align = "left"  # aligns the entire table left
+  )
 
 ```
