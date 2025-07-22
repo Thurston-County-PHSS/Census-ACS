@@ -142,4 +142,11 @@ hist(thurston_tract_pop_2020$value,
 
 ## Searching for Variables
 
-There are thousands of variables ids across census tables and summary files. The [load_variables()](https://walker-data.com/tidycensus/reference/load_variables.html) function obtains a dataset of variables from the Census website and formats it for searching. The function takes two arguments, `year` which is the year of the Census or end year of the ACS, and `dataset`. For 2020 data set "pl" represents the undefined
+There are thousands of variables ids across census tables and summary files. The [load_variables()](https://walker-data.com/tidycensus/reference/load_variables.html) function obtains a dataset of variables from the Census website and formats it for searching. The function takes two arguments, `year` which is the year of the Census or end year of the ACS, and `dataset`. For 2020 data set "pl" represents the PL-94171 Redistricting dataset. 
+
+```{r}
+
+```
+
+
+To get variables ACS users need to specify 
