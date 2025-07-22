@@ -73,7 +73,7 @@ population_WA_Counties_2020 <- get_decennial(
   geography = "county",
   year = 2020,
   state = "WA",
-  variable = "P1_005N"
+  variable = "P1_001N"
 )
 
 ```
@@ -116,11 +116,30 @@ head(wa_counties_agesex, n = 10) %>%
 
 ## Geography levels
 
-The geography aggregation level available differs between get_acs() and get_decennial() with the latter going down to the Census block-level and the former having the small enumeration unit of block group. Other political and statistical enumeration levels are available as well, see section 2.2 in book for table.
+The geography aggregation level available differs between get_acs() and get_decennial() with the latter going down to the Census block-level and the former having the smallest enumeration unit of block group at the 5 year level or for populations above 65,000 for the 1 year ACS data. Other political and statistical enumeration levels are available as well, see section 2.2 in the book for a table.
 
 Lets get population counts at the 2020 Census Tract level for Thurston County, WA.
 
+```{r Get Thurston Pop}
+#| message: false
+thurston_tract_pop_2020 <- get_decennial(
+  geography = "tract",
+  year = 2020,
+  state = "WA",
+  county = "Thurston",
+  variable = "P1_001N"
+)
+```
+
 ```{r}
+#| echo: FALSE
+hist(thurston_tract_pop_2020$value, 
+     col = "#3E938BFF", 
+     main = "Thurston County Census Tract Population Counts",
+     xlab = "")
 
 ```
 
+## Searching for Variables
+
+There are thousands of variables ids across census tables and summary files. The [load_variables()](https://walker-data.com/tidycensus/reference/load_variables.html) function obtains a dataset of variables from the Census website and formats it for searching. The function takes two arguments, `year` which is the year of the Census or end year of the ACS, and `dataset`. For 2020 data set "pl" represents the undefined
