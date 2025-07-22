@@ -11,7 +11,11 @@ format:
     code-tools: false
     theme: cosmo
     fig-format: svg
+editor_options: 
+  chunk_output_type: console
 ---
+
+Notes and examples based on [Analyzing US Census Data: Methods, Maps, and models in R](https://walker-data.com/census-r/index.html)
 
 ```{r required packages}
 # install.packages("pacman") optional but nice way to install and load multiple packages at once, can also use install.packages and library separately 
@@ -33,7 +37,6 @@ Once obtained and activated from your email install the API on your computer. Se
 This only needs to be done one time
 
 ```{r Install API Key}
-# install.packages("tidycensus") if not installed
 # census_api_key("YOUR KEY GOES HERE", install = TRUE)
 ```
 
@@ -41,7 +44,7 @@ This only needs to be done one time
 
 Using function [`get_decennial()`](https://walker-data.com/tidycensus/reference/get_decennial.html) users can retrieve data from the 2000, 2010 or 2020 US Censuses.
 
-Lets get the 2010 population estimates for each County in WA.
+Lets get the 2010 and 2020 population estimates for each County in WA and look at 10 rows in each dataset.
 
 ```{r Get 2010 WA Population}
 #| message: false
@@ -56,10 +59,68 @@ population_WA_Counties_2010 <- get_decennial(
 
 ```{r}
 #| echo: FALSE
-head(population_WA_Counties_2010, n = 5) %>% 
+head(population_WA_Counties_2010, n = 10) %>% 
   gt() %>% 
   tab_options(
     table.align = "left"  # aligns the entire table left
   )
 
 ```
+
+```{r Get 2020 WA Population}
+#| message: false
+population_WA_Counties_2020 <- get_decennial(
+  geography = "county",
+  year = 2020,
+  state = "WA",
+  variable = "P1_005N"
+)
+
+```
+
+```{r}
+#| echo: FALSE
+head(population_WA_Counties_2020, n = 10) %>% 
+  gt() %>% 
+  tab_options(
+    table.align = "left"  # aligns the entire table left
+  )
+
+```
+
+## Getting ACS Data
+
+Using function [`get_ACS()`](https://walker-data.com/tidycensus/reference/get_acs.html) users can retrieve data from single year or 5 year ACS tables. This function defaults to the most recent 5 year ACS data if not otherwise specified. Unlike the Decennial data variables from ACS tables contain both an estimated value and Margin of Error. Users can specify variable names and get_acs will auto-detect what table to look for them in. Alternatively, users can also specify a table name to get all the variables in that table.
+
+Lets get table B01001 which gives counts of sex by age group for the most recent 5 year ACS data release in 2023.
+
+```{r Get age & sex counts by county}
+#| message: false
+wa_counties_agesex <- get_acs(
+  geography = "county",
+  state = "WA",
+  table = "B01001",
+  year = 2023
+)
+```
+
+```{r}
+#| echo: FALSE
+head(wa_counties_agesex, n = 10) %>% 
+  gt() %>% 
+  tab_options(
+    table.align = "left"  # aligns the entire table left
+  )
+
+```
+
+## Geography levels
+
+The geography aggregation level available differs between get_acs() and get_decennial() with the latter going down to the Census block-level and the former having the small enumeration unit of block group. Other political and statistical enumeration levels are available as well, see section 2.2 in book for table.
+
+Lets get population counts at the 2020 Census Tract level for Thurston County, WA.
+
+```{r}
+
+```
+
