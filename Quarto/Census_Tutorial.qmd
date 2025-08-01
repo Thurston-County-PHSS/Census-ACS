@@ -90,7 +90,7 @@ head(population_WA_Counties_2020, n = 10) %>%
 
 ## Getting ACS Data
 
-Using function [`get_ACS()`](https://walker-data.com/tidycensus/reference/get_acs.html) users can retrieve data from single year or 5 year ACS tables. This function defaults to the most recent 5 year ACS data if not otherwise specified. Unlike the Decennial data, variables from ACS tables contain both an estimated value and Margin of Error. Users can specify variable names and get_acs() will auto-detect what table to look for them in. Alternatively, users can also specify a table name to get all the variables in that table.
+Using function [`get_ACS()`](https://walker-data.com/tidycensus/reference/get_acs.html) users can retrieve data from single year or 5 year ACS tables. This function defaults to the most recent 5 year ACS data if not otherwise specified. Unlike the Decennial data, variables from ACS tables contain both an estimated value and Margin of Error. Users can specify variable names and `get_acs()` will auto-detect what table to look for them in. Alternatively, users can also specify a table name to get all the variables in that table.
 
 Lets get table B01001 which gives counts of sex by age group for the most recent 5 year ACS data release in 2023.
 
@@ -116,7 +116,7 @@ head(wa_counties_agesex, n = 10) %>%
 
 ## Geography levels
 
-The geography aggregation level available differs between get_acs() and get_decennial() with the latter going down to the Census block-level and the former having the smallest enumeration unit of block group at the 5 year level or for populations above 65,000 for the 1 year ACS data. Other political and statistical enumeration levels are available as well, see section 2.2 in the book for a table of these groupings.
+The geography aggregation level available differs between `get_acs()` and `get_decennial()` with the latter going down to the Census block-level and the former having the smallest enumeration unit of block group at the 5 year level or for populations above 65,000 for the 1 year ACS data. Other political and statistical enumeration levels are available as well, see section 2.2 in the book for a table of these groupings.
 
 Lets get population counts at the 2020 Census Tract level for Thurston County, WA.
 
@@ -142,11 +142,33 @@ hist(thurston_tract_pop_2020$value,
 
 ## Searching for Variables
 
-There are thousands of variables ids across census tables and summary files. The [load_variables()](https://walker-data.com/tidycensus/reference/load_variables.html) function obtains a dataset of variables from the Census website and formats it for searching. The function takes two arguments, `year` which is the year of the Census or end year of the ACS, and `dataset`. For 2020 dataset "pl" represents the PL-94171 Redistricting dataset, which contains population counts at various geographic levels. 
+### Decennial Census
 
-```{r}
+There are thousands of variables ids across census tables and summary files. The [load_variables()](https://walker-data.com/tidycensus/reference/load_variables.html) function obtains a dataset of variables from the Census website and formats it for searching. The function takes two arguments, `year` which is the year of the Census or end year of the ACS, and `dataset`. For 2020 dataset "`pl`" represents the PL-94171 Redistricting dataset, which contains population counts at various geographic levels.
+
+```{r get pl dataset variables}
+pl_variables <- load_variables(year = 2020, dataset = "pl")
 
 ```
 
+```{r list some variables}
+#| echo: FALSE
+head(pl_variables, n = 10) %>% 
+  gt() %>% 
+  tab_options(
+    table.align = "left"  # aligns the entire table left
+  )
+```
 
-To get variables ACS users need to specify 
+### ACS
+
+To get ACS variables users need to specify either "`acs1`" for the one year ACS, "`acs5`" for the 5 year ACS or "acsse" for supplemental estimates. "`acs5`" and "`acs1`" by default returns variables for the ACS Detailed Tables, which contain the most detailed estimates on all topics for all geographies down to the block group level. Users can also add a suffix in the form of "`acs5/suffix`" for more limited data sets.
+
+| Dataset | Description | Suffix |
+|------------------------|------------------------------|------------------|
+| ACS Data Profile | most requested estimates on social, economic, housing and demographics | `/profile` |
+| Summary Tables | Provide social, economic, housing, or demographic information for a particular topic or subpopulation. These tables have an "S" prefix | `/summary` |
+| Comparison Profile | Comparison Profiles are similar to Data Profiles but also include comparisons with past-year data. The current 5-year data are compared with the preceding non-overlapping 5-year data | `/cprofile` |
+| Detailed Tables | All topics all Geographies | none |
+
+: ACS Dataset Suffixs
