@@ -15,7 +15,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-Notes and examples based on [Analyzing US Census Data: Methods, Maps, and models in R](https://walker-data.com/census-r/index.html)
+Based on [Analyzing US Census Data: Methods, Maps, and models in R](https://walker-data.com/census-r/index.html)
 
 ```{r required packages}
 # install.packages("pacman") optional but nice way to install and load multiple packages at once, can also use install.packages and library separately 
@@ -172,3 +172,22 @@ To get ACS variables users need to specify either "`acs1`" for the one year ACS,
 | Detailed Tables | All topics all Geographies | none |
 
 : ACS Dataset Suffixs
+
+```{r get ACS variables}
+
+var_ACS5<- load_variables(year = 2023, "acs5")
+
+```
+
+```{r list some variables}
+#| echo: FALSE
+head(var_ACS5, n = 10) %>% 
+  gt() %>% 
+  tab_options(
+    table.align = "left"  # aligns the entire table left
+  )
+```
+
+The returned data frame always has three columns: `name`, which refers to the Census variable ID; `label`, which is a descriptive data label for the variable; and `concept`, which refers to the topic of the data and often corresponds to a table of Census data. For the 5-year ACS detailed tables, the returned data frame also includes a fourth column, `geography`, which specifies the smallest geography at which a given variable is available from the Census API. As illustrated above, the data frame can be filtered using tidyverse tools for variable exploration. However, the RStudio integrated development environment includes an interactive data viewer which is ideal for browsing this dataset, and allows for interactive sorting and filtering. The data viewer can be accessed with the [`View()`](https://rdrr.io/r/utils/View.html) function.
+
+By browsing the table in this way, users can identify the appropriate variable IDs (found in the `name` column) that can be passed to the `variables` parameter in [`get_acs()`](https://walker-data.com/tidycensus/reference/get_acs.html) or [`get_decennial()`](https://walker-data.com/tidycensus/reference/get_decennial.html). Users may note that the raw variable IDs in the ACS, as consumed by the API, require a suffix of `E` or `M`. **tidycensus** does not require this suffix, as it will automatically return both the estimate and margin of error for a given requested variable. Additionally, if users desire an entire table of related variables from the ACS, the user should supply the characters prior to the underscore from a variable ID to the `table` parameter.
