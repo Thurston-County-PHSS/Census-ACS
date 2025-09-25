@@ -165,7 +165,7 @@ head(pl_variables, n = 10) %>%
 To get ACS variables users need to specify either "`acs1`" for the one year ACS, "`acs5`" for the 5 year ACS or "acsse" for supplemental estimates. "`acs5`" and "`acs1`" by default returns variables for the ACS Detailed Tables, which contain the most detailed estimates on all topics for all geographies down to the block group level. Users can also add a suffix in the form of "`acs5/suffix`" for more limited data sets.
 
 | Dataset | Description | Suffix |
-|------------------------|------------------------------|------------------|
+|----|----|----|
 | ACS Data Profile | most requested estimates on social, economic, housing and demographics | `/profile` |
 | Summary Tables | Provide social, economic, housing, or demographic information for a particular topic or subpopulation. These tables have an "S" prefix | `/summary` |
 | Comparison Profile | Comparison Profiles are similar to Data Profiles but also include comparisons with past-year data. The current 5-year data are compared with the preceding non-overlapping 5-year data | `/cprofile` |
