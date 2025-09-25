@@ -199,5 +199,24 @@ By browsing the table in this way, users can identify the appropriate variable I
 
 Census variables IDs can be cumbersome to type and remember in the course of an R session. As such, tidycensus has built-in tools to automatically rename the variable IDs if requested by a user. For example, let’s say that a user is requesting data on median household income (variable ID `B19013_001`) and median age (variable ID `B01002_001`). By passing a named vector to the variables parameter in get_acs() or get_decennial(), the functions will return the desired names rather than the Census variable IDs. Let’s examine this for counties in Georgia from the 2016-2020 five-year ACS.
 
+```{r georgia age and income}
+ga <- get_acs(
+  geography = "county",
+  state = "Georgia",
+  variables = c(medinc = "B19013_001",
+                medage = "B01002_001"),
+  year = 2020
+)
+```
 
+```{r list}
+#| echo: FALSE
+head(ga, n = 10) %>% 
+  gt() %>% 
+  tab_options(
+    table.align = "left"  # aligns the entire table left
+  )
+```
+
+Variable names are now modified based on your input.
 
