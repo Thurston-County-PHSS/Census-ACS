@@ -43,6 +43,7 @@ This only needs to be done one time
 ## Getting Census Data
 
 Using function [`get_decennial()`](https://walker-data.com/tidycensus/reference/get_decennial.html) users can retrieve data from the 2000, 2010 or 2020 US Censuses.
+By default this function uses argument sumfile = "sf1", which gets data from the decennial census summary file 1. This file exists for the 2000 and 2010 Censuses and includes core demographic characteristics for census geographies. While summary file 2 has information on population and housing unit characteristics. Income and occupation data are further detailed in summary file 3 and 4. The 2020 Decennial Census data are available from the PL 94-171 Redistricting summary file, which is specified with sumfile = "pl", which is the default when year is set to 2020. The Redistricting summary files include a limited subset of variables from the decennial US Census to be used for legislative redistricting. These variables include total population and housing units; race and ethnicity; voting-age population; and group quarters population. 
 
 Lets get the 2010 and 2020 population estimates for each County in WA and look at 10 rows in each dataset.
 
@@ -90,9 +91,11 @@ head(population_WA_Counties_2020, n = 10) %>%
 
 ## Getting ACS Data
 
-Using function [`get_ACS()`](https://walker-data.com/tidycensus/reference/get_acs.html) users can retrieve data from single year or 5 year ACS tables. This function defaults to the most recent 5 year ACS data if not otherwise specified. Unlike the Decennial data, variables from ACS tables contain both an estimated value and Margin of Error. Users can specify variable names and `get_acs()` will auto-detect what table to look for them in. Alternatively, users can also specify a table name to get all the variables in that table.
+Using function [`get_ACS()`](https://walker-data.com/tidycensus/reference/get_acs.html) users can retrieve data from single year or 5 year ACS tables. This function defaults to the most recent 5 year ACS data if not otherwise specified. Unlike the Decennial data, variables from ACS tables contain both an estimated value and Margin of Error that corresponds to a 90% CI. Users can specify variable names and `get_acs()` will auto-detect what table to look for them in. Alternatively, users can also specify a table name to get all the variables in that table.
 
-Lets get table B01001 which gives counts of sex by age group for the most recent 5 year ACS data release in 2023.
+Using the survey argument users can specify if they want the 1 year ACS or 5 year with the default being the 5 year, survey = "acs1", or "acs5".
+
+Lets get table B01001 which gives counts of sex by age group for the most recent 5 year ACS data release in 2023. We will specify we want the data at the County level for WA state.
 
 ```{r Get age & sex counts by county}
 #| message: false
@@ -142,8 +145,6 @@ hist(thurston_tract_pop_2020$value,
 
 ## Searching for Variables
 
-### Decennial Census
-
 There are thousands of variables ids across census tables and summary files. The [load_variables()](https://walker-data.com/tidycensus/reference/load_variables.html) function obtains a dataset of variables from the Census website and formats it for searching. The function takes two arguments, `year` which is the year of the Census or end year of the ACS, and `dataset`. For 2020 dataset "`pl`" represents the PL-94171 Redistricting dataset, which contains population counts at various geographic levels.
 
 ```{r get pl dataset variables}
@@ -162,7 +163,9 @@ head(pl_variables, n = 10) %>%
 
 ### ACS
 
-To get ACS variables users need to specify either "`acs1`" for the one year ACS, "`acs5`" for the 5 year ACS or "acsse" for supplemental estimates. "`acs5`" and "`acs1`" by default returns variables for the ACS Detailed Tables, which contain the most detailed estimates on all topics for all geographies down to the block group level. Users can also add a suffix in the form of "`acs5/suffix`" for more limited data sets.
+To get ACS variables users need to specify either "`acs1`" for the one year ACS, "`acs5`" for the 5 year ACS or "acsse" for supplemental estimates. "`acs5`" and "`acs1`" by default returns variables for the ACS Detailed Tables if no suffix is specified. The detailed tables contain the most detailed estimates on all topics for all geographies down to the block group level. Users can also add a suffix in the form of "`acs5/suffix`" for more limited data sets.
+
+This function requires processing thousands of variables from the Census Bureau which may take a few moments depending on the user’s internet connection, the user can specify cache = TRUE in the function call to store the data in the user’s cache directory for future access. On subsequent calls of the load_variables() function, cache = TRUE will direct the function to look in the cache directory for the variables rather than the Census website.
 
 | Dataset | Description | Suffix |
 |----|----|----|
@@ -190,4 +193,11 @@ head(var_ACS5, n = 10) %>%
 
 The returned data frame always has three columns: `name`, which refers to the Census variable ID; `label`, which is a descriptive data label for the variable; and `concept`, which refers to the topic of the data and often corresponds to a table of Census data. For the 5-year ACS detailed tables, the returned data frame also includes a fourth column, `geography`, which specifies the smallest geography at which a given variable is available from the Census API. The data frame can be filtered using tidyverse tools for variable exploration. However, the RStudio integrated development environment includes an interactive data viewer which is ideal for browsing this dataset, and allows for interactive sorting and filtering. The data viewer can be accessed with the [`View()`](https://rdrr.io/r/utils/View.html) function.
 
-By browsing the table in this way, users can identify the appropriate variable IDs (found in the `name` column) that can be passed to the `variables` parameter in [`get_acs()`](https://walker-data.com/tidycensus/reference/get_acs.html) or [`get_decennial()`](https://walker-data.com/tidycensus/reference/get_decennial.html). Users may note that the raw variable IDs in the ACS, as consumed by the API, require a suffix of `E` or `M`. **tidycensus** does not require this suffix, as it will automatically return both the estimate and margin of error for a given requested variable. Additionally, if users desire an entire table of related variables from the ACS, the user should supply the characters prior to the underscore from a variable ID to the `table` parameter.
+By browsing the table in this way, users can identify the appropriate variable IDs (found in the `name` column) that can be passed to the `variables` parameter in [`get_acs()`](https://walker-data.com/tidycensus/reference/get_acs.html) or [`get_decennial()`](https://walker-data.com/tidycensus/reference/get_decennial.html). Users may note that the raw variable IDs in the ACS, as consumed by the API, require a suffix of `E` or `M`. **tidycensus** does not require this suffix, as it will automatically return both the estimate and margin of error for a given requested variable. Additionally, if users desire an entire table of related variables from the ACS, the user should supply the characters prior to the underscore from a variable ID to the `table` parameter. For example variable B07101_030 is in table B07101.
+
+## Renaming Variable IDs
+
+Census variables IDs can be cumbersome to type and remember in the course of an R session. As such, tidycensus has built-in tools to automatically rename the variable IDs if requested by a user. For example, let’s say that a user is requesting data on median household income (variable ID `B19013_001`) and median age (variable ID `B01002_001`). By passing a named vector to the variables parameter in get_acs() or get_decennial(), the functions will return the desired names rather than the Census variable IDs. Let’s examine this for counties in Georgia from the 2016-2020 five-year ACS.
+
+
+
